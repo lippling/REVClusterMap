@@ -29,4 +29,6 @@
 /** Specifies the receiver‚Äôs delegate object. */
 @property(nonatomic,assign) id<MKMapViewDelegate> delegate;
 
+@property (nonatomic, assign) BOOL clusteringEnabled;
+
 @end

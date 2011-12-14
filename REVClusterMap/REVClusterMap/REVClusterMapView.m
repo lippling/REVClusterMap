@@ -22,7 +22,7 @@
 @synthesize minimumClusterLevel;
 @synthesize blocks;
 @synthesize delegate;
-
+@synthesize clusteringEnabled;
 
 - (id) initWithFrame:(CGRect)frame
 {
@@ -190,16 +190,17 @@
 
 - (void) mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
-    
-    if( [self mapViewDidZoom] )
+    if (clusteringEnabled)
     {
-        [super removeAnnotations:self.annotations];
-        self.showsUserLocation = self.showsUserLocation;
-    }
+        if( [self mapViewDidZoom] )
+        {
+            [super removeAnnotations:self.annotations];
+            self.showsUserLocation = self.showsUserLocation;
+        }
     
-    NSArray *add = [REVClusterManager clusterAnnotationsForMapView:self forAnnotations:annotationsCopy blocks:self.blocks minClusterLevel:self.minimumClusterLevel];
-    //NSLog(@"count:: %i",[add count]);
-    [super addAnnotations:add];
+        NSArray *add = [REVClusterManager clusterAnnotationsForMapView:self forAnnotations:annotationsCopy blocks:self.blocks minClusterLevel:self.minimumClusterLevel];
+        [super addAnnotations:add];
+    }
     
     if( [delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)] )
     {
@@ -221,12 +222,18 @@
 
 - (void) addAnnotations:(NSArray *)annotations
 {
-    [annotationsCopy release];
-    annotationsCopy = [annotations copy];
+    if (clusteringEnabled)
+    {
+        [annotationsCopy release];
+        annotationsCopy = [annotations copy];
     
-    NSArray *add = [REVClusterManager clusterAnnotationsForMapView:self forAnnotations:annotations blocks:self.blocks minClusterLevel:self.minimumClusterLevel];
-    
-    [super addAnnotations:add];
+        NSArray *add = [REVClusterManager clusterAnnotationsForMapView:self forAnnotations:annotations blocks:self.blocks minClusterLevel:self.minimumClusterLevel];
+        [super addAnnotations:add];
+    }
+    else
+    {
+        [super addAnnotations:annotations];
+    }
 }
 
 
